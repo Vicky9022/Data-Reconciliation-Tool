@@ -1,0 +1,35 @@
+# Requires the production Compose file and Caddy.sso instead of Caddyfile.
+services:
+  app:
+    environment:
+      RECON_SSO_ONLY: "1"
+      RECON_SSO_PROXY_SECRET: ${RECON_SSO_PROXY_SECRET:?Set a 32+ character proxy secret}
+  edge:
+    environment:
+      RECON_SSO_PROXY_SECRET: ${RECON_SSO_PROXY_SECRET:?Set a 32+ character proxy secret}
+    volumes:
+      - ./deploy/Caddy.sso:/etc/caddy/Caddyfile:ro
+  identity:
+    image: quay.io/oauth2-proxy/oauth2-proxy:v7.9.0
+    restart: unless-stopped
+    environment:
+      OAUTH2_PROXY_PROVIDER: oidc
+      OAUTH2_PROXY_OIDC_ISSUER_URL: ${RECON_OIDC_ISSUER:?Set the issuer}
+      OAUTH2_PROXY_CLIENT_ID: ${RECON_OIDC_CLIENT_ID:?Set the client ID}
+      OAUTH2_PROXY_CLIENT_SECRET: ${RECON_OIDC_CLIENT_SECRET:?Set the client secret}
+      OAUTH2_PROXY_COOKIE_SECRET: ${RECON_OIDC_COOKIE_SECRET:?Set a 32-byte base64 cookie key}
+      OAUTH2_PROXY_COOKIE_SECURE: "true"
+      OAUTH2_PROXY_COOKIE_SAMESITE: lax
+      OAUTH2_PROXY_COOKIE_REFRESH: 5m
+      OAUTH2_PROXY_REDIRECT_URL: https://${RECON_DOMAIN}/oauth2/callback
+      OAUTH2_PROXY_EMAIL_DOMAINS: ${RECON_ALLOWED_EMAIL_DOMAIN:?Set your organization's domain}
+      OAUTH2_PROXY_UPSTREAMS: http://app:8000
+      OAUTH2_PROXY_HTTP_ADDRESS: 0.0.0.0:4180
+      OAUTH2_PROXY_REVERSE_PROXY: "true"
+      OAUTH2_PROXY_PASS_USER_HEADERS: "true"
+      OAUTH2_PROXY_SKIP_PROVIDER_BUTTON: "true"
+      OAUTH2_PROXY_REQUEST_LOGGING: "false"
+    expose:
+      - "4180"
+    security_opt:
+      - no-new-privileges:true

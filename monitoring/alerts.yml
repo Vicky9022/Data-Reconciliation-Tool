@@ -1,0 +1,37 @@
+groups:
+  - name: reconciliation-service
+    rules:
+      - alert: ReconcileUnavailable
+        expr: up{job="reconcile"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: Reconciliation service cannot be scraped
+      - alert: ReconcileStorageLow
+        expr: reconcile_disk_free_bytes < 1073741824
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: Data-volume free space is below 1 GiB
+      - alert: ReconcileFailures
+        expr: delta(reconcile_runs{state="failed"}[5m]) > 0
+        labels:
+          severity: warning
+        annotations:
+          summary: A new reconciliation failure requires investigation
+      - alert: ReconcileWorkerStale
+        expr: reconcile_worker_heartbeat_age_seconds > 120
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: Coordinator heartbeat is stale
+      - alert: ReconcileQueueDelayed
+        expr: reconcile_oldest_queued_seconds > 300
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: A comparison has waited more than five minutes for processing

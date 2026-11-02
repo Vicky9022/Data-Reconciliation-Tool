@@ -1,0 +1,34 @@
+{
+  "timestamp_utc": "2026-10-28T19:23:59.693078+00:00",
+  "python": "3.12.14",
+  "docker_engine_available": true,
+  "tests_run": 55,
+  "passed": 52,
+  "skipped": 3,
+  "failures": 0,
+  "errors": 0,
+  "duration_seconds": 184.164,
+  "skipped_tests": [
+    {
+      "test": "test_job_lease_fencing_against_real_postgres (test_integration.PostgreSQLIntegration.test_job_lease_fencing_against_real_postgres)",
+      "reason": "Live staging not enabled; set RECON_RUN_INTEGRATION=1 after starting deploy/staging.yaml"
+    },
+    {
+      "test": "test_live_database_ingestion_through_remote_worker (test_integration.PostgreSQLIntegration.test_live_database_ingestion_through_remote_worker)",
+      "reason": "Live staging not enabled; set RECON_RUN_INTEGRATION=1 after starting deploy/staging.yaml"
+    },
+    {
+      "test": "test_readonly_role_cannot_modify_source (test_integration.PostgreSQLIntegration.test_readonly_role_cannot_modify_source)",
+      "reason": "Live staging not enabled; set RECON_RUN_INTEGRATION=1 after starting deploy/staging.yaml"
+    }
+  ],
+  "validation_limits": [
+    "Live PostgreSQL, object-store and OIDC integrations require explicit environment acceptance tests.",
+    "Independent penetration review and production recovery objectives require external validation."
+  ],
+  "browser_verified": [
+    "Synthetic sign-in and measured dashboard",
+    "Operations center and coordinator heartbeat",
+    "Additional browser checks are recorded in RELEASE-2.1.md"
+  ]
+}

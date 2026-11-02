@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "checks": [
+    "Certificate chain and localhost identity verified with an isolated test CA",
+    "HTTPS reverse proxy reaches the production application",
+    "Production HSTS response header is present"
+  ],
+  "scope": "Local private CA; no browser warning bypass or machine trust-store modification. Public-domain ACME issuance requires the deployment domain."
+}

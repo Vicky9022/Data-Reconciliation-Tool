@@ -1,0 +1,11 @@
+{$RECON_DOMAIN} {
+    request_body {
+        max_size 32MB
+    }
+    reverse_proxy app:8000 {
+        transport http {
+            read_timeout 120s
+            write_timeout 120s
+        }
+    }
+}

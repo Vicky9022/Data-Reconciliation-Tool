@@ -1,0 +1,65 @@
+services:
+  app:
+    image: reconcile-platform:${RECON_IMAGE_TAG:-2.1}
+    build: .
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    volumes:
+      - reconcile-data:/data
+    environment:
+      RECON_SECRET: ${RECON_SECRET:?Set a random session secret}
+      RECON_ADMIN_EMAIL: ${RECON_ADMIN_EMAIL:?Set bootstrap administrator email}
+      RECON_ADMIN_PASSWORD: ${RECON_ADMIN_PASSWORD:?Set bootstrap password}
+      RECON_PUBLIC_URL: https://${RECON_DOMAIN:?Set your domain}
+      RECON_REQUIRE_MFA: ${RECON_REQUIRE_MFA:-1}
+      RECON_MFA_KEY: ${RECON_MFA_KEY:?Set a separate stable MFA encryption secret}
+      RECON_DATASET_ACL: "1"
+      RECON_CONNECTIONS: ${RECON_CONNECTIONS:-}
+      RECON_SOURCE_DSN: ${RECON_SOURCE_DSN:-}
+      RECON_DESTINATION_DSN: ${RECON_DESTINATION_DSN:-}
+      RECON_ARCHIVE_KEY: ${RECON_ARCHIVE_KEY:-}
+      RECON_ARCHIVE_S3_BUCKET: ${RECON_ARCHIVE_S3_BUCKET:-}
+      RECON_ARCHIVE_KMS_KEY: ${RECON_ARCHIVE_KMS_KEY:-}
+      RECON_REQUIRE_OBJECT_LOCK: ${RECON_REQUIRE_OBJECT_LOCK:-1}
+      RECON_SMTP_HOST: ${RECON_SMTP_HOST:-}
+      RECON_SMTP_PORT: ${RECON_SMTP_PORT:-587}
+      RECON_SMTP_FROM: ${RECON_SMTP_FROM:-}
+      RECON_SMTP_USER: ${RECON_SMTP_USER:-}
+      RECON_SMTP_PASSWORD: ${RECON_SMTP_PASSWORD:-}
+      RECON_METRICS_TOKEN: ${RECON_METRICS_TOKEN:-}
+      RECON_MAX_UPLOAD_BYTES: ${RECON_MAX_UPLOAD_BYTES:-1073741824}
+      RECON_UPLOAD_QUOTA_BYTES: ${RECON_UPLOAD_QUOTA_BYTES:-4294967296}
+      RECON_MAX_RECORDS: ${RECON_MAX_RECORDS:-5000000}
+      RECON_MAX_EXCEPTIONS: ${RECON_MAX_EXCEPTIONS:-2000000}
+    expose:
+      - "8000"
+    mem_limit: 512m
+    cpus: 2
+    stop_grace_period: 130s
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+  edge:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      RECON_DOMAIN: ${RECON_DOMAIN:?Set your domain}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      app:
+        condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+volumes:
+  reconcile-data:
+  caddy-data:
+  caddy-config:

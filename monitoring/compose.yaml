@@ -1,0 +1,42 @@
+# From the project directory:
+# docker compose -f compose.yaml -f monitoring/compose.yaml up -d
+services:
+  app:
+    environment:
+      RECON_METRICS_TOKEN: ${RECON_METRICS_TOKEN:?Set the same value as the metrics_token secret file}
+  prometheus:
+    image: prom/prometheus:v3.2.1
+    restart: unless-stopped
+    command: [--config.file=/etc/prometheus/prometheus.yml, --storage.tsdb.retention.time=30d]
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - prometheus-data:/prometheus
+    secrets:
+      - metrics_token
+    ports:
+      - 127.0.0.1:9090:9090
+  alertmanager:
+    image: prom/alertmanager:v0.28.1
+    restart: unless-stopped
+    volumes:
+      - ./monitoring/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    ports:
+      - 127.0.0.1:9093:9093
+  grafana:
+    image: grafana/grafana:11.6.0
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${RECON_GRAFANA_PASSWORD:?Set a Grafana admin password}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana:/etc/grafana/provisioning:ro
+    ports:
+      - 127.0.0.1:3000:3000
+secrets:
+  metrics_token:
+    file: ${RECON_METRICS_TOKEN_FILE:?Set the protected bearer-token file path}
+volumes:
+  prometheus-data:
+  grafana-data:

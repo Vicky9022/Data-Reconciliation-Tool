@@ -1,0 +1,97 @@
+name: reconcile-staging
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_PASSWORD: local-staging-root-password
+      POSTGRES_DB: reconcile
+    ports:
+      - 127.0.0.1:6543:5432
+    volumes:
+      - stage-postgres:/var/lib/postgresql/data
+      - ./staging-init.sql:/docker-entrypoint-initdb.d/01-fixture.sql:ro
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U postgres -d reconcile]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  minio:
+    image: motoserver/moto:latest
+    environment:
+      MOTO_PORT: "9000"
+    ports:
+      - 127.0.0.1:9900:9000
+  buckets:
+    build: ..
+    depends_on:
+      - minio
+    environment:
+      AWS_ACCESS_KEY_ID: stage-operator
+      AWS_SECRET_ACCESS_KEY: local-staging-object-password
+      AWS_DEFAULT_REGION: us-east-1
+    command: [python, /app/deploy/init_bucket.py]
+    volumes:
+      - ./init_bucket.py:/app/deploy/init_bucket.py:ro
+    healthcheck:
+      disable: true
+  app:
+    build: ..
+    command: [python, run.py, --port, "8765", --host, "0.0.0.0", --local-stage]
+    ports:
+      - 127.0.0.1:8766:8765
+    environment: &stage-environment
+      RECON_DATA_DIR: /data
+      RECON_SECRET: local-staging-session-key-change-outside-loopback
+      RECON_LOCAL_STAGE: "1"
+      RECON_DATASET_ACL: "1"
+      RECON_PUBLIC_URL: http://127.0.0.1:8766
+      RECON_JOB_DATABASE_URL: postgresql://recon_jobs:local-job-password@postgres/reconcile
+      RECON_CONNECTIONS: '{"customer-lab":{"source":{"dsn_env":"STAGE_READ_DSN","schema":"source_data","table":"customers"},"destination":{"dsn_env":"STAGE_READ_DSN","schema":"destination_data","table":"customers"}}}'
+      STAGE_READ_DSN: postgresql://recon_read:local-read-password@postgres/reconcile
+      RECON_WORK_BUCKET: reconcile-work
+      RECON_S3_ENDPOINT: http://minio:9000
+      AWS_ACCESS_KEY_ID: stage-operator
+      AWS_SECRET_ACCESS_KEY: local-staging-object-password
+      AWS_DEFAULT_REGION: us-east-1
+      RECON_METRICS_TOKEN: local-staging-metrics-token-32-characters
+      RECON_SMTP_HOST: mailpit
+      RECON_SMTP_PORT: "1025"
+      RECON_SMTP_FROM: noreply@reconcile.local
+    volumes:
+      - stage-app:/data
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8765/healthz',timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    depends_on:
+      postgres:
+        condition: service_healthy
+      buckets:
+        condition: service_completed_successfully
+  worker:
+    build: ..
+    command: [python, -m, distributed]
+    environment:
+      <<: *stage-environment
+      TMPDIR: /scratch
+    volumes:
+      - stage-scratch:/scratch
+    depends_on:
+      postgres:
+        condition: service_healthy
+      buckets:
+        condition: service_completed_successfully
+    healthcheck:
+      disable: true
+    deploy:
+      replicas: 2
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - 127.0.0.1:8025:8025
+volumes:
+  stage-postgres:
+  stage-objects:
+  stage-app:
+  stage-scratch:

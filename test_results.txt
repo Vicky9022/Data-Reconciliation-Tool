@@ -1,0 +1,60 @@
+test_analyst_cannot_accept (test_api.APITests.test_analyst_cannot_accept) ... ok
+test_auth_csrf_origin_and_headers (test_api.APITests.test_auth_csrf_origin_and_headers) ... ok
+test_coordinator_process_lock (test_api.APITests.test_coordinator_process_lock) ... ok
+test_exports_formula_safe (test_api.APITests.test_exports_formula_safe) ... ok
+test_failed_job_has_no_partial_results (test_api.APITests.test_failed_job_has_no_partial_results) ... ok
+test_idempotency (test_api.APITests.test_idempotency) ... ok
+test_login_throttle_and_logout (test_api.APITests.test_login_throttle_and_logout) ... ok
+test_production_cookies_and_no_demo_backdoor (test_api.APITests.test_production_cookies_and_no_demo_backdoor) ... ok
+test_production_requires_credentials (test_api.APITests.test_production_requires_credentials) ... ok
+test_queue_limit (test_api.APITests.test_queue_limit) ... ok
+test_request_validation_and_queue_permissions (test_api.APITests.test_request_validation_and_queue_permissions) ... ok
+test_restart_recovers_unfinished_job (test_api.APITests.test_restart_recovers_unfinished_job) ... ok
+test_review_and_append_only_audit_chain (test_api.APITests.test_review_and_append_only_audit_chain) ... ok
+test_run_queue_evidence_filter_and_reproducibility (test_api.APITests.test_run_queue_evidence_filter_and_reproducibility) ... ok
+test_secret_rotation_invalidates_sessions (test_api.APITests.test_secret_rotation_invalidates_sessions) ... ok
+test_unknown_column_rule_fails_without_results (test_api.APITests.test_unknown_column_rule_fails_without_results) ... ok
+test_viewer_restrictions_and_revoke_sessions (test_api.APITests.test_viewer_restrictions_and_revoke_sessions) ... ok
+test_corrupt_input_cannot_publish_results (test_distributed.DistributedTests.test_corrupt_input_cannot_publish_results) ... ok
+test_lost_lease_cannot_finish (test_distributed.DistributedTests.test_lost_lease_cannot_finish) ... ok
+test_remote_artifacts_and_result_checksum (test_distributed.DistributedTests.test_remote_artifacts_and_result_checksum) ... ok
+test_composite_key_reordered_rows (test_engine.EngineTests.test_composite_key_reordered_rows) ... ok
+test_corrected_dataset (test_engine.EngineTests.test_corrected_dataset) ... ok
+test_dates_and_timezone (test_engine.EngineTests.test_dates_and_timezone) ... ok
+test_duplicate_evidence_cap (test_engine.EngineTests.test_duplicate_evidence_cap) ... ok
+test_duplicate_isolation_and_overlap (test_engine.EngineTests.test_duplicate_isolation_and_overlap) ... ok
+test_exact_decimal_tolerance_and_precision (test_engine.EngineTests.test_exact_decimal_tolerance_and_precision) ... ok
+test_exact_injection_oracle_and_reproducibility (test_engine.EngineTests.test_exact_injection_oracle_and_reproducibility) ... ok
+test_invalid_key (test_engine.EngineTests.test_invalid_key) ... ok
+test_invalid_numeric_not_nan_match (test_engine.EngineTests.test_invalid_numeric_not_nan_match) ... ok
+test_invalid_rule_rejected (test_engine.EngineTests.test_invalid_rule_rejected) ... ok
+test_malformed_csv_and_headers (test_engine.EngineTests.test_malformed_csv_and_headers) ... ok
+test_missing_and_changed_schema (test_engine.EngineTests.test_missing_and_changed_schema) ... ok
+test_nullability_normalization_explicit (test_engine.EngineTests.test_nullability_normalization_explicit) ... ok
+test_chunked_upload_offsets_checksums_ownership_and_sealing (test_enterprise.EnterpriseTests.test_chunked_upload_offsets_checksums_ownership_and_sealing) ... ok
+test_connector_cannot_bypass_dataset_permissions (test_enterprise.EnterpriseTests.test_connector_cannot_bypass_dataset_permissions) ... ok
+test_dataset_acl_applies_to_list_detail_evidence_and_reviews (test_enterprise.EnterpriseTests.test_dataset_acl_applies_to_list_detail_evidence_and_reviews) ... ok
+test_encrypted_archival_authentication_legal_hold_and_purge (test_enterprise.EnterpriseTests.test_encrypted_archival_authentication_legal_hold_and_purge) ... ok
+test_independent_audit_archive_has_verifiable_checkpoint (test_enterprise.EnterpriseTests.test_independent_audit_archive_has_verifiable_checkpoint) ... ok
+test_metrics_authorization_operations_and_hold (test_enterprise.EnterpriseTests.test_metrics_authorization_operations_and_hold) ... ok
+test_mfa_enrollment_recovery_codes_and_replay (test_enterprise.EnterpriseTests.test_mfa_enrollment_recovery_codes_and_replay) ... ok
+test_object_lock_archive_request_requires_compliance_and_kms (test_enterprise.EnterpriseTests.test_object_lock_archive_request_requires_compliance_and_kms) ... ok
+test_recovery_attempts_are_limited_without_consuming_valid_tokens (test_enterprise.EnterpriseTests.test_recovery_attempts_are_limited_without_consuming_valid_tokens) ... ok
+test_recovery_token_single_use_no_account_enumeration (test_enterprise.EnterpriseTests.test_recovery_token_single_use_no_account_enumeration) ... ok
+test_required_mfa_blocks_data_until_enrollment (test_enterprise.EnterpriseTests.test_required_mfa_blocks_data_until_enrollment) ... ok
+test_totp_rfc_vector_replay_and_window (test_enterprise.EnterpriseTests.test_totp_rfc_vector_replay_and_window) ... ok
+test_trusted_sso_requires_secret_and_existing_member (test_enterprise.EnterpriseTests.test_trusted_sso_requires_secret_and_existing_member) ... ok
+test_upload_larger_than_original_limit (test_enterprise.EnterpriseTests.test_upload_larger_than_original_limit) ... ok
+test_upload_quota_and_expired_scratch_cleanup (test_enterprise.EnterpriseTests.test_upload_quota_and_expired_scratch_cleanup) ... ok
+test_job_lease_fencing_against_real_postgres (test_integration.PostgreSQLIntegration.test_job_lease_fencing_against_real_postgres) ... skipped 'Live staging not enabled; set RECON_RUN_INTEGRATION=1 after starting deploy/staging.yaml'
+test_live_database_ingestion_through_remote_worker (test_integration.PostgreSQLIntegration.test_live_database_ingestion_through_remote_worker) ... skipped 'Live staging not enabled; set RECON_RUN_INTEGRATION=1 after starting deploy/staging.yaml'
+test_readonly_role_cannot_modify_source (test_integration.PostgreSQLIntegration.test_readonly_role_cannot_modify_source) ... skipped 'Live staging not enabled; set RECON_RUN_INTEGRATION=1 after starting deploy/staging.yaml'
+test_backup_restore_integrity_and_operator_password_reset (test_operations.OperationsTests.test_backup_restore_integrity_and_operator_password_reset) ... ok
+test_compose_password_round_trip (test_release.ReleaseConfigurationTests.test_compose_password_round_trip) ... ok
+test_reject_bad_domain_email_and_password (test_release.ReleaseConfigurationTests.test_reject_bad_domain_email_and_password) ... ok
+test_strong_distinct_keys_and_literal_password (test_release.ReleaseConfigurationTests.test_strong_distinct_keys_and_literal_password) ... ok
+
+----------------------------------------------------------------------
+Ran 55 tests in 181.085s
+
+OK (skipped=3)

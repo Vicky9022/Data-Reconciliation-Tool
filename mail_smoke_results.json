@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "checks": [
+    "Encrypted recovery outbox delivered to the local SMTP sink",
+    "Captured one-use link reset only the disposable member",
+    "New password authenticated successfully"
+  ],
+  "scope": "Mailpit only; no external email was sent. Test member access revoked after the check."
+}

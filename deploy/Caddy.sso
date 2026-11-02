@@ -1,0 +1,10 @@
+{$RECON_DOMAIN} {
+    request_body {
+        max_size 32MB
+    }
+    reverse_proxy identity:4180 {
+        header_up -X-Forwarded-Email
+        header_up -X-Auth-Request-Email
+        header_up X-Recon-Proxy-Secret {$RECON_SSO_PROXY_SECRET}
+    }
+}

@@ -1,0 +1,30 @@
+# Add to compose.yaml on the application host. Workers can also run remotely,
+# using the same job-database, private object bucket and workload IAM permissions.
+services:
+  app:
+    environment: &remote-environment
+      RECON_JOB_DATABASE_URL: ${RECON_JOB_DATABASE_URL:?Set a TLS PostgreSQL job-database URL}
+      RECON_WORK_BUCKET: ${RECON_WORK_BUCKET:?Set a private artifact bucket}
+      RECON_WORK_KMS_KEY: ${RECON_WORK_KMS_KEY:?Set the artifact KMS key}
+      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:?Set the object storage region}
+  worker:
+    build: .
+    command: [python, -m, distributed]
+    environment:
+      <<: *remote-environment
+      TMPDIR: /scratch
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    volumes:
+      - worker-scratch:/scratch
+    healthcheck:
+      disable: true
+    mem_limit: 1g
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+volumes:
+  worker-scratch:

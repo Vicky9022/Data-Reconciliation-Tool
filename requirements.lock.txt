@@ -1,0 +1,18 @@
+# Resolved in the verified Linux/Python 3.12 deployment image.
+boto3==1.43.120
+botocore==1.43.120
+cffi==2.1.1
+cryptography==50.0.2
+et_xmlfile==2.0.0
+gunicorn==25.3.0
+jmespath==1.1.0
+openpyxl==3.1.5
+packaging==26.3
+psycopg==3.3.6
+psycopg-binary==3.3.6
+pycparser==3.12
+python-dateutil==2.9.0.post0
+s3transfer==0.19.3
+six==1.17.0
+typing_extensions==4.16.0
+urllib3==2.8.0

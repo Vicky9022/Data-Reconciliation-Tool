@@ -1,0 +1,13 @@
+{
+  "requests": 100,
+  "concurrency": 8,
+  "errors": 0,
+  "elapsed_seconds": 1.131,
+  "requests_per_second": 88.38,
+  "latency_p50_ms": 43.75,
+  "latency_p95_ms": 91.21,
+  "latency_p99_ms": 531.39,
+  "fixture_exceptions": 150,
+  "fixture_source_rows": 10000,
+  "scope": "Loopback synthetic workspace, warm read endpoints, no TLS/proxy. Not a production capacity guarantee."
+}

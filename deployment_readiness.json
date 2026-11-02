@@ -1,0 +1,118 @@
+{
+  "timestamp_utc": "2026-10-28T20:06:07.798249+00:00",
+  "status": "ready_for_supported_deployment",
+  "supported_scope": "Linux x86-64, one dashboard/coordinator on a persistent volume; optional PostgreSQL/S3 remote workers",
+  "local_suite": {
+    "passed": 52,
+    "integration_cases_skipped_in_local_suite": 3
+  },
+  "live_integration_suite": {
+    "passed": 3,
+    "skipped": 0,
+    "services": "PostgreSQL 17, two workers, Moto S3 test service"
+  },
+  "total_distinct_regression_cases_passed": 55,
+  "production_container": {
+    "image": "reconcile-platform:2.1",
+    "passed": true,
+    "checks": [
+      "Production Gunicorn process starts as non-root with a read-only root filesystem",
+      "Native login, secure cookies, mandatory MFA enrollment and recovery codes",
+      "Persisted reconciliation, exception evidence, CSV and Excel exports",
+      "Volume persistence, encrypted authenticator storage and recovery-code login survive container restart"
+    ],
+    "scope": "Disposable localhost production-image smoke test; public DNS/TLS and organization OIDC are not exercised."
+  },
+  "https_proxy": {
+    "passed": true,
+    "checks": [
+      "Certificate chain and localhost identity verified with an isolated test CA",
+      "HTTPS reverse proxy reaches the production application",
+      "Production HSTS response header is present"
+    ],
+    "scope": "Local private CA; no browser warning bypass or machine trust-store modification. Public-domain ACME issuance requires the deployment domain."
+  },
+  "smtp_recovery": {
+    "passed": true,
+    "checks": [
+      "Encrypted recovery outbox delivered to the local SMTP sink",
+      "Captured one-use link reset only the disposable member",
+      "New password authenticated successfully"
+    ],
+    "scope": "Mailpit only; no external email was sent. Test member access revoked after the check."
+  },
+  "security": {
+    "known_python_dependency_vulnerabilities": 0,
+    "medium_high_static_findings_after_review": 0,
+    "reviewed_bound_parameter_sql_annotations": 3,
+    "independent_penetration_test": false,
+    "operating_system_image_scan": false
+  },
+  "additional_checks": [
+    "Account-scoped proxy-aware throttling regressions passed",
+    "Authentication endpoint size limits and chunk-upload compatibility passed",
+    "Configuration secrets and Docker password round trip passed",
+    "Non-root runtime UID verified as 10001",
+    "All five Compose profiles validated",
+    "Pinned Linux dependencies and Python base digest",
+    "Prebuilt image archive exported and SHA-256 recorded"
+  ],
+  "image_bundle": {
+    "images": {
+      "reconcile-platform:2.1": {
+        "id": "sha256:62b7472a8d8ba7ca4238fc62ffac8ac1228f83507e578029a58ac926ec7fd457",
+        "repo_digests": [
+          "reconcile-platform@sha256:62b7472a8d8ba7ca4238fc62ffac8ac1228f83507e578029a58ac926ec7fd457",
+          "reconcile-staging-app@sha256:62b7472a8d8ba7ca4238fc62ffac8ac1228f83507e578029a58ac926ec7fd457"
+        ],
+        "platform": "linux/amd64",
+        "portable_fingerprint": "c0be5996409f1ea80ba4eb4df21559c239fa30b939a2d3f9cdff59d083ebc94e"
+      },
+      "caddy:2-alpine": {
+        "id": "sha256:eb4d35b7452d1ab6171fbdbe8d9275b2301dad6dad92115d91e19fb9b24d510f",
+        "repo_digests": [
+          "caddy@sha256:eb4d35b7452d1ab6171fbdbe8d9275b2301dad6dad92115d91e19fb9b24d510f"
+        ],
+        "platform": "linux/amd64",
+        "portable_fingerprint": "ac423fb2ad038eb26c6603a7138786dd0df0fb1317a843fca6718cc1f4aa1fc7"
+      },
+      "postgres:17-alpine": {
+        "id": "sha256:266d3c257594e195b309ae9d1805e54c788f1d7b375f56bf6c367aac6c917e7b",
+        "repo_digests": [
+          "postgres@sha256:266d3c257594e195b309ae9d1805e54c788f1d7b375f56bf6c367aac6c917e7b"
+        ],
+        "platform": "linux/amd64",
+        "portable_fingerprint": "8aaca269a908f7a569d33ac0956dcb7fc6541b08cf4b457d418bc68374f1a0c9"
+      },
+      "motoserver/moto:latest": {
+        "id": "sha256:59a1965d845249b04def37a0e2565f9cc6c44543cb89b68e90f28f344b3b0d1a",
+        "repo_digests": [
+          "motoserver/moto@sha256:59a1965d845249b04def37a0e2565f9cc6c44543cb89b68e90f28f344b3b0d1a"
+        ],
+        "platform": "linux/amd64",
+        "portable_fingerprint": "1d773a982fa517aadec3754e37805b27016e05e311dfdaf09c95ce25eae5091a"
+      },
+      "axllent/mailpit:latest": {
+        "id": "sha256:0790692be935ea4420d085694f7985b1f692ca6a8771ab0e0bd8ba75ac180498",
+        "repo_digests": [
+          "axllent/mailpit@sha256:0790692be935ea4420d085694f7985b1f692ca6a8771ab0e0bd8ba75ac180498"
+        ],
+        "platform": "linux/amd64",
+        "portable_fingerprint": "910b5fb693c2c5c9980bb42442205181d2b5a36c86147148df80c048a02d227f"
+      }
+    },
+    "archive": "Reconcile-Deployment-Images.tar.gz",
+    "archive_sha256": "3562fb3f1b52202d935129d0e49e8f43729aa3e4b8fdfde93860b04ce3ef726a",
+    "archive_bytes": 98513349
+  },
+  "operator_inputs": [
+    "Deployment host and DNS domain",
+    "Administrator credentials entered privately by configure",
+    "Optional identity provider, SMTP, alert destination and cloud IAM settings"
+  ],
+  "scope_limits": [
+    "Public-domain certificate issuance is checked on the target host by the startup helper",
+    "No multi-dashboard HA or organizational SLA claim",
+    "Actual production AWS Object Lock/IAM and organization OIDC need account-specific acceptance"
+  ]
+}

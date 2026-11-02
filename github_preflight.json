@@ -1,0 +1,17 @@
+{
+  "checked_at_utc": "2026-11-02T14:35:34.649699+00:00",
+  "local_tests": {
+    "run": 55,
+    "passed": 52,
+    "skipped_live_integration": 3,
+    "failures": 0,
+    "errors": 0
+  },
+  "live_evidence": "Earlier real container/PostgreSQL/TLS/SMTP results remain in deployment_readiness.json; they were not rerun for GitHub publication.",
+  "repository": "https://github.com/Vicky9022/Data-Reconciliation-Tool",
+  "visibility_requested": "public",
+  "limits": [
+    "Source publication does not deploy the app.",
+    "Hosted GitHub Actions results must be checked after upload."
+  ]
+}

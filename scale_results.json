@@ -1,0 +1,19 @@
+{
+  "measured_date": "2026-10-28",
+  "python": "3.12.14",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "source_rows": 100000,
+  "destination_rows": 99995,
+  "matching_records": 99875,
+  "exception_events": 150,
+  "exact_events_expected": 150,
+  "exact_events_detected": 150,
+  "detection_recall": 1.0,
+  "false_positive_rate": 0.0,
+  "classification_accuracy": 1.0,
+  "runtime_seconds_with_tracemalloc": 91.79593,
+  "peak_python_allocations_bytes": 2161882,
+  "reproducible_summary": true,
+  "fingerprint": "87c0aa239b2a77310edbacb5d79f6db63b653de3553abebd88d45b17c5f35e9a",
+  "scope": "One 100,000-row deterministic fixture written incrementally. Runtime excludes fixture generation, file ingestion, API persistence and export. Memory is Python allocations, not total RSS or SQLite native memory."
+}

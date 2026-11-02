@@ -1,0 +1,43 @@
+{
+  "scope": "Syntax/configuration only, using public fixture settings; no containers were started.",
+  "profiles": [
+    {
+      "files": [
+        "deploy/staging.yaml"
+      ],
+      "valid": true,
+      "error": ""
+    },
+    {
+      "files": [
+        "compose.yaml"
+      ],
+      "valid": true,
+      "error": ""
+    },
+    {
+      "files": [
+        "compose.yaml",
+        "deploy/distributed.yaml"
+      ],
+      "valid": true,
+      "error": ""
+    },
+    {
+      "files": [
+        "compose.yaml",
+        "deploy/sso.yaml"
+      ],
+      "valid": true,
+      "error": ""
+    },
+    {
+      "files": [
+        "compose.yaml",
+        "monitoring/compose.yaml"
+      ],
+      "valid": true,
+      "error": ""
+    }
+  ]
+}

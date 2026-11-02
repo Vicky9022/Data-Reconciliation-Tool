@@ -1,0 +1,13 @@
+.env
+.env.*
+.secrets
+archives
+backups
+*.recon
+*.partial
+runtime
+__pycache__
+tests
+*.zip
+.git
+.venv

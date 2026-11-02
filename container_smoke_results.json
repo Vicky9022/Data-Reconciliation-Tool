@@ -1,0 +1,11 @@
+{
+  "image": "reconcile-platform:2.1",
+  "passed": true,
+  "checks": [
+    "Production Gunicorn process starts as non-root with a read-only root filesystem",
+    "Native login, secure cookies, mandatory MFA enrollment and recovery codes",
+    "Persisted reconciliation, exception evidence, CSV and Excel exports",
+    "Volume persistence, encrypted authenticator storage and recovery-code login survive container restart"
+  ],
+  "scope": "Disposable localhost production-image smoke test; public DNS/TLS and organization OIDC are not exercised."
+}
