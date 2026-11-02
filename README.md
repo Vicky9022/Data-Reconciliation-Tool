@@ -1,27 +1,24 @@
-# Reconcile 2.1 · Deployment release
+# Data Reconciliation Tool
 
-**Deployment is now verified. Start with [DEPLOYMENT.md](DEPLOYMENT.md).** The Docker build, production-image login/MFA/export/restart checks, trusted HTTPS proxy, live PostgreSQL/remote-worker integration, and local SMTP recovery checks have passed. Exact Linux dependencies and the Python base image are pinned. The downloadable image archive contains the application and edge images.
+Reconcile checks whether records arrived correctly after a migration or ETL job. It compares CSV files or PostgreSQL table pairs and shows missing records, duplicate keys, changed values, and schema differences. Matching row counts alone can hide these problems.
 
-Read [RELEASE-2.1.md](RELEASE-2.1.md) for the implementation history. Earlier Docker/integration blockers described there are superseded by the deployment evidence in `deployment_readiness.json`.
+Choose a unique identifier or composite key, set the comparison rules, and run a check. The dashboard shows source and destination values beside each finding. Analysts can investigate a difference, record a decision, export the exceptions, and run another comparison after a correction.
 
-For public source publication, see [GITHUB.md](GITHUB.md). Production configuration and runtime data are excluded from version control.
+Source and destination inputs stay read-only. Each run retains its snapshots, rules, and fingerprints so the result can be checked later.
 
-Source repository: [Vicky9022/Data-Reconciliation-Tool](https://github.com/Vicky9022/Data-Reconciliation-Tool).
+![Reconciliation dashboard showing the synthetic customer dataset](dashboard-preview.png)
 
-
-A local-first reconciliation application for an analyst team. It compares retained source and destination snapshots, isolates ambiguous keys, records explicit rules, and supports an evidence-led investigation workflow.
-
-This replaces the earlier Streamlit demonstration with an authenticated web application and a disk-backed engine. It is packaged for **one dashboard/coordinator process on a persistent local volume, with optional PostgreSQL/S3 remote workers**, behind HTTPS. The dashboard itself remains single-node; the new remote comparison workers do not establish dashboard high availability or certify suitability for your infrastructure. Live PostgreSQL, Docker deployment, disaster recovery on your hosting provider, and organization-specific access policies require environment validation before business data goes live.
+The screenshot uses generated customer data. The local demo creates its own comparison, so the figures come from that run.
 
 ## Open the application
 
-Requires Python 3.12 or later. The CSV engine, web API, authentication, persistent queue, audit records and browser UI use the Python standard library. The local CSV demo needs no dependency installation.
+Requires Python 3.12 or later. The CSV engine, web API, password authentication, persistent queue and audit records use the Python standard library. The browser UI uses HTML, CSS and JavaScript. The local CSV demo needs no dependency installation.
 
 ```powershell
 python run.py
 ```
 
-Open **http://127.0.0.1:8765** and choose **Explore synthetic workspace**. The first visit creates a measured comparison of 10,000 generated customers. On Windows, `start-demo.ps1` can also find the bundled Codex Python runtime when Python is not on PATH. The launcher binds only to localhost and explicitly enables synthetic demo sign-in. Never expose this launcher to a network.
+Open **http://127.0.0.1:8765** and choose **Explore synthetic workspace**. The first visit creates a measured comparison of 10,000 generated customers. On Windows, `start-demo.ps1` can also find the bundled Python runtime when Python is not on PATH. The launcher binds only to localhost and explicitly enables synthetic demo sign-in. Never expose this launcher to a network.
 
 To enable Excel downloads and the optional PostgreSQL driver:
 
@@ -29,7 +26,7 @@ To enable Excel downloads and the optional PostgreSQL driver:
 python -m pip install -r requirements.txt
 ```
 
-## What is included
+## What the app handles
 
 | Area | Implemented behavior |
 |---|---|
@@ -47,7 +44,7 @@ python -m pip install -r requirements.txt
 | Audit | Append-only SQL triggers; serialized SHA-256 hash chain; administrator activity view; offline integrity verification |
 | Operations | Container configuration, HTTPS reverse proxy, health endpoint, request IDs, logs, live SQLite backups, password reset and session revocation |
 
-## Verify
+## Run the tests
 
 ```powershell
 python -m unittest discover -s tests -v
@@ -56,9 +53,9 @@ python benchmark.py
 
 `tests/` uses the standard-library test runner; no pytest installation is needed. It checks the independently defined injection oracle, decimal precision, duplicate overlap, composite keys, schema drift, malformed input, CSRF/origin checks, RBAC, review evidence, audit integrity, formula-safe exports, idempotent submissions, rate limiting, production cookie flags, coordinator locking and restart recovery.
 
-Current verification: 52 local tests passed, and all 3 live integration cases passed separately in staging. Production container, HTTPS and local SMTP smoke checks also passed. The final verification record is in `verification.json`. Browser checks also confirmed persisted review notes, the corrected fixture improving from 150 findings to zero, and a mobile layout without document overflow.
+The recorded results show 52 local tests passed, and all 3 live integration cases passed separately in staging. Production container, HTTPS and local SMTP smoke checks also passed. The verification record is in `verification.json`. Browser checks confirmed persisted review notes, the corrected fixture improving from 150 findings to zero, and a mobile layout without document overflow.
 
-### Actual benchmark
+### Benchmark results
 
 The measured fixture was run on October 28, 2026 using Python 3.12.14 on Windows. The exact output is in `measured_results.json`.
 
@@ -76,7 +73,7 @@ The measured fixture was run on October 28, 2026 using Python 3.12.14 on Windows
 
 The benchmark excludes generation, upload decoding, API persistence and export. Traced memory excludes native SQLite allocations and is not process RSS. These measurements are evidence for this fixture, not a general accuracy or throughput guarantee. Runs in the UI record their own elapsed processing time without tracemalloc.
 
-## Comparison contract
+## How records are compared
 
 - Key values match exactly, including whitespace. Use a transaction identifier or composite key to distinguish legitimate repeated transactions.
 - Duplicate groups are never paired arbitrarily. Group evidence shows the first 20 rows; complete input snapshots are retained. Duplicate groups can also produce missing/unexpected findings.
@@ -91,12 +88,25 @@ The benchmark excludes generation, upload decoding, API persistence and export. 
 
 ## Production deployment
 
-The 2.1 release adds mandatory native MFA by default in the production Compose profile, default-deny dataset grants, an OIDC proxy overlay, PostgreSQL/S3 workers, and an instrumented staging stack. See RELEASE-2.1.md before following the base single-node deployment instructions.
+Version 2.1 runs **one dashboard/coordinator process on a persistent local volume**, behind HTTPS. Optional PostgreSQL/S3 remote workers handle comparisons, while the dashboard remains single-node. They do not provide dashboard high availability. Validate the deployment on your host, including disaster recovery and organization-specific access policies, before using business data.
 
-
-See **OPERATIONS.md** for deployment, connection configuration, secrets, backup/restore, integrity checks and operating limits. **API.md** describes the authenticated interface.
+Start with [DEPLOYMENT.md](DEPLOYMENT.md) for the deployment steps. The production Compose profile requires native MFA by default and denies dataset access until it is granted. An OIDC proxy overlay and an instrumented staging stack are included.
 
 The supplied Docker Compose deployment starts one non-root application process and a Caddy HTTPS proxy. The application refuses production startup without a 32+ character session secret and first-start administrator credentials. The production factory never enables synthetic sign-in.
+
+The Docker build, production-image login/MFA/export/restart checks, trusted HTTPS proxy, live PostgreSQL/remote-worker integration, and local SMTP recovery checks have passed. Exact Linux dependencies and the Python base image are pinned. The separate prebuilt image archive contains the application and edge images. Results are recorded in `deployment_readiness.json`; earlier Docker/integration blockers in the release history have been resolved.
+
+Production configuration and runtime data are excluded from version control. A live deployment still needs your server, domain/DNS and private credentials.
+
+## Documentation
+
+- [DEPLOYMENT.md](DEPLOYMENT.md): server setup and deployment commands.
+- [OPERATIONS.md](OPERATIONS.md): connections, secrets, backup/restore, integrity checks and operating limits.
+- [API.md](API.md): the authenticated API.
+- [RELEASE-2.1.md](RELEASE-2.1.md): implementation history.
+- [GITHUB.md](GITHUB.md): source publication and repository setup.
+
+Source repository: [Vicky9022/Data-Reconciliation-Tool](https://github.com/Vicky9022/Data-Reconciliation-Tool).
 
 ## Project map
 
