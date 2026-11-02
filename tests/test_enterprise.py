@@ -10,9 +10,9 @@ import types
 import sys
 from pathlib import Path
 from unittest.mock import patch
-import test_api as fixtures
-from enterprise import totp,valid_step
-from server import password_hash
+from tests import test_api as fixtures
+from reconcile.enterprise import totp,valid_step
+from reconcile.server import password_hash
 
 class EnterpriseTests(unittest.TestCase):
     setUp=fixtures.APITests.setUp
@@ -121,7 +121,7 @@ class EnterpriseTests(unittest.TestCase):
         with self.app.db() as db:self.assertEqual(1,db.execute('SELECT legal_hold FROM retention').fetchone()[0])
 
     def test_encrypted_archival_authentication_legal_hold_and_purge(self):
-        from governance import retain,decrypt_file
+        from reconcile.governance import retain,decrypt_file
         self.login();rid=self.queued();self.execute(rid)
         with self.app.db() as db:db.execute("UPDATE runs SET created='2020-01-01T00:00:00+00:00' WHERE id=?",(rid,))
         with tempfile.TemporaryDirectory() as directory,patch.dict(os.environ,{'RECON_ARCHIVE_KEY':base64.urlsafe_b64encode(b'k'*32).decode()}):
@@ -143,7 +143,7 @@ class EnterpriseTests(unittest.TestCase):
         with patch.dict(os.environ,{'RECON_CONNECTIONS':''}):self.assertEqual([],self.call('/api/connections')['body']['aliases'])
         uid=self.call('/api/users','POST',{'email':'connector-test@example.com','password':'long-test-password','role':'analyst'})['body']['id']
         user={'id':uid,'role':'analyst'}
-        from server import APIError
+        from reconcile.server import APIError
         with patch.dict(os.environ,{'RECON_CONNECTIONS':json.dumps({'private':{'dataset':'Private accounts','source':{},'destination':{}}})}):
             with self.assertRaises(APIError):self.app.validate_connection_payload({'connection':'private','dataset':'Different name'},user)
             with self.assertRaises(APIError):self.app.validate_connection_payload({'connection':'private','dataset':'Private accounts'},user)
@@ -163,7 +163,7 @@ class EnterpriseTests(unittest.TestCase):
         self.assertEqual(429,self.call('/api/password-reset/complete','POST',{'token':'wrong','password':'a-long-new-password'})['status'])
 
     def test_object_lock_archive_request_requires_compliance_and_kms(self):
-        from governance import locked_s3_copy
+        from reconcile.governance import locked_s3_copy
         from unittest.mock import MagicMock
         client=MagicMock();client.get_object_lock_configuration.return_value={'ObjectLockConfiguration':{'ObjectLockEnabled':'Enabled'}};client.put_object.return_value={'VersionId':'immutable-v1'}
         with tempfile.TemporaryDirectory() as folder,patch.dict(os.environ,{'RECON_ARCHIVE_S3_BUCKET':'test-bucket','RECON_ARCHIVE_KMS_KEY':'test-kms-key'}),patch.dict(sys.modules,{'boto3':types.SimpleNamespace(client=lambda service:client)}):
@@ -174,7 +174,7 @@ class EnterpriseTests(unittest.TestCase):
             with self.assertRaises(ValueError):locked_s3_copy(file,30)
 
     def test_independent_audit_archive_has_verifiable_checkpoint(self):
-        from governance import archive_ledger,decrypt_file
+        from reconcile.governance import archive_ledger,decrypt_file
         import zipfile
         self.login()
         with tempfile.TemporaryDirectory() as folder,patch.dict(os.environ,{'RECON_ARCHIVE_KEY':base64.urlsafe_b64encode(b'z'*32).decode()}):

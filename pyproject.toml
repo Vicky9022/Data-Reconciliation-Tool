@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "reconcile-platform"
+version = "2.1.0"
+description = "Data reconciliation for CSV snapshots and PostgreSQL migrations"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.optional-dependencies]
+excel = ["openpyxl==3.1.5"]
+postgres = ["psycopg[binary]>=3.2,<4"]
+production = [
+    "openpyxl==3.1.5",
+    "psycopg[binary]>=3.2,<4",
+    "gunicorn>=23,<26; sys_platform != 'win32'",
+    "waitress>=3,<4; sys_platform == 'win32'",
+    "cryptography>=44,<51",
+    "boto3>=1.35,<2",
+]
+
+[project.scripts]
+reconcile-demo = "reconcile.__main__:main"
+reconcile-manage = "reconcile.manage:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+reconcile = ["static/*.html", "static/*.css", "static/*.js"]

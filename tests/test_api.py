@@ -8,8 +8,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
-sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from server import Application, password_hash
+from reconcile.server import Application, password_hash
 
 class APITests(unittest.TestCase):
     def setUp(self):
@@ -66,7 +65,7 @@ class APITests(unittest.TestCase):
         self.assertEqual(400,self.call(f'/api/issues/{iid}/review','POST',{'decision':'accepted','note':'short'})['status'])
         self.assertEqual(200,self.call(f'/api/issues/{iid}/review','POST',{'decision':'accepted','note':'Approved under documented policy T-123.'})['status'])
         issue=self.call('/api/runs/'+rid+'/issues')['body']['issues'][0];self.assertEqual('accepted',issue['status']);self.assertEqual(1,len(issue['reviews']))
-        from engine import canonical
+        from reconcile.engine import canonical
         with self.app.db() as db:
             previous='0'*64
             for row in db.execute('SELECT * FROM audit ORDER BY id'):

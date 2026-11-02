@@ -11,3 +11,10 @@ tests
 *.zip
 .git
 .venv
+reports
+docs
+benchmarks
+scripts
+*.egg-info
+dist
+build

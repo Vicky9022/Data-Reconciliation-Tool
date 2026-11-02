@@ -6,19 +6,20 @@ Choose a unique identifier or composite key, set the comparison rules, and run a
 
 Source and destination inputs stay read-only. Each run retains its snapshots, rules, and fingerprints so the result can be checked later.
 
-![Reconciliation dashboard showing the synthetic customer dataset](dashboard-preview.png)
+![Reconciliation dashboard showing the synthetic customer dataset](docs/images/dashboard-preview.png)
 
 The screenshot uses generated customer data. The local demo creates its own comparison, so the figures come from that run.
 
 ## Open the application
 
-Requires Python 3.12 or later. The CSV engine, web API, password authentication, persistent queue and audit records use the Python standard library. The browser UI uses HTML, CSS and JavaScript. The local CSV demo needs no dependency installation.
+Requires Python 3.12 or later. The CSV engine, web API, password authentication, persistent queue and audit records use the Python standard library. The browser UI uses HTML, CSS and JavaScript. The local CSV demo needs no optional dependencies. Install the package from the repository root:
 
 ```powershell
-python run.py
+python -m pip install -e . --no-deps
+python -m reconcile
 ```
 
-Open **http://127.0.0.1:8765** and choose **Explore synthetic workspace**. The first visit creates a measured comparison of 10,000 generated customers. On Windows, `start-demo.ps1` can also find the bundled Python runtime when Python is not on PATH. The launcher binds only to localhost and explicitly enables synthetic demo sign-in. Never expose this launcher to a network.
+Open **http://127.0.0.1:8765** and choose **Explore synthetic workspace**. The first visit creates a measured comparison of 10,000 generated customers. On Windows, `scripts/start-demo.ps1` can also find the bundled Python runtime when Python is not on PATH. The launcher binds only to localhost and explicitly enables synthetic demo sign-in. Never expose this launcher to a network.
 
 To enable Excel downloads and the optional PostgreSQL driver:
 
@@ -47,17 +48,19 @@ python -m pip install -r requirements.txt
 ## Run the tests
 
 ```powershell
-python -m unittest discover -s tests -v
-python benchmark.py
+python -m unittest discover -s tests -t . -v
+python -m benchmarks.benchmark
+# Save the full test report under reports/:
+python scripts/verify.py
 ```
 
 `tests/` uses the standard-library test runner; no pytest installation is needed. It checks the independently defined injection oracle, decimal precision, duplicate overlap, composite keys, schema drift, malformed input, CSRF/origin checks, RBAC, review evidence, audit integrity, formula-safe exports, idempotent submissions, rate limiting, production cookie flags, coordinator locking and restart recovery.
 
-The recorded results show 52 local tests passed, and all 3 live integration cases passed separately in staging. Production container, HTTPS and local SMTP smoke checks also passed. The verification record is in `verification.json`. Browser checks confirmed persisted review notes, the corrected fixture improving from 150 findings to zero, and a mobile layout without document overflow.
+The package layout checks passed 55 local tests and all 3 live integration cases, run separately in staging. Production container, HTTPS, local SMTP recovery and installed-package checks also passed. See the [layout verification record](docs/validation/2026-11-02/repository-layout.json). Earlier [release validation](docs/validation/2026-10-29/) includes browser checks of persisted review notes, a corrected fixture improving from 150 findings to zero, and a mobile layout without document overflow.
 
 ### Benchmark results
 
-The measured fixture was run on October 28, 2026 using Python 3.12.14 on Windows. The exact output is in `measured_results.json`.
+The measured fixture was run on October 28, 2026 using Python 3.12.14 on Windows. The exact output is in [`measured_results.json`](docs/validation/2026-10-29/measured_results.json).
 
 | Metric | Measured |
 |---|---:|
@@ -90,35 +93,38 @@ The benchmark excludes generation, upload decoding, API persistence and export. 
 
 Version 2.1 runs **one dashboard/coordinator process on a persistent local volume**, behind HTTPS. Optional PostgreSQL/S3 remote workers handle comparisons, while the dashboard remains single-node. They do not provide dashboard high availability. Validate the deployment on your host, including disaster recovery and organization-specific access policies, before using business data.
 
-Start with [DEPLOYMENT.md](DEPLOYMENT.md) for the deployment steps. The production Compose profile requires native MFA by default and denies dataset access until it is granted. An OIDC proxy overlay and an instrumented staging stack are included.
+Start with [deployment guide](docs/deployment.md) for the deployment steps. The production Compose profile requires native MFA by default and denies dataset access until it is granted. An OIDC proxy overlay and an instrumented staging stack are included.
 
 The supplied Docker Compose deployment starts one non-root application process and a Caddy HTTPS proxy. The application refuses production startup without a 32+ character session secret and first-start administrator credentials. The production factory never enables synthetic sign-in.
 
-The Docker build, production-image login/MFA/export/restart checks, trusted HTTPS proxy, live PostgreSQL/remote-worker integration, and local SMTP recovery checks have passed. Exact Linux dependencies and the Python base image are pinned. The separate prebuilt image archive contains the application and edge images. Results are recorded in `deployment_readiness.json`; earlier Docker/integration blockers in the release history have been resolved.
+The Docker build, production-image login/MFA/export/restart checks, trusted HTTPS proxy, live PostgreSQL/remote-worker integration, and local SMTP recovery checks have passed. Exact Linux dependencies and the Python base image are pinned. The separate prebuilt image archive contains the application and edge images. Results are recorded in [`deployment_readiness.json`](docs/validation/2026-10-29/deployment_readiness.json); earlier Docker/integration blockers in the release history have been resolved.
 
 Production configuration and runtime data are excluded from version control. A live deployment still needs your server, domain/DNS and private credentials.
 
 ## Documentation
 
-- [DEPLOYMENT.md](DEPLOYMENT.md): server setup and deployment commands.
-- [OPERATIONS.md](OPERATIONS.md): connections, secrets, backup/restore, integrity checks and operating limits.
-- [API.md](API.md): the authenticated API.
-- [RELEASE-2.1.md](RELEASE-2.1.md): implementation history.
-- [GITHUB.md](GITHUB.md): source publication and repository setup.
+- [deployment guide](docs/deployment.md): server setup and deployment commands.
+- [operations guide](docs/operations.md): connections, secrets, backup/restore, integrity checks and operating limits.
+- [API reference](docs/api.md): the authenticated API.
+- [2.1 release history](docs/releases/2.1.md): implementation history.
+- [contributor guide](docs/contributing.md): local development, checks and pull requests.
 
 Source repository: [Vicky9022/Data-Reconciliation-Tool](https://github.com/Vicky9022/Data-Reconciliation-Tool).
 
-## Project map
+## Project layout
 
 ```text
-engine.py          Disk-backed matching, rules, evidence and fingerprints
-server.py          WSGI API, access control, queue, persistence and audit
-synthetic.py       Synthetic inputs and independent injection oracle
-static/            Browser UI (no build pipeline or external assets)
-tests/             Engine and service regression tests
-benchmark.py       Reproducible measured fixture
-manage.py          Operator backup, integrity and credential utilities
-run.py             Localhost synthetic demo launcher
-Dockerfile         Non-root production container
-compose.yaml       Single-node application and HTTPS proxy
+src/reconcile/     Application package, engine, API and browser assets
+tests/             Engine, API, access-control and integration tests
+benchmarks/        Reproducible fixture benchmark and HTTP load exercise
+scripts/           Deployment helper, verification runner and service checks
+deploy/            Caddy config, Compose overlays, fixtures and image manifest
+monitoring/        Prometheus, Grafana and Alertmanager configuration
+docs/              Deployment, operations, API, release history and screenshots
+docs/validation/   Recorded results from the tested release
+reports/           New test and benchmark output; ignored by Git
+compose.yaml       Production application and HTTPS proxy
+Dockerfile         Non-root production image
 ```
+
+Run package, benchmark and script commands from the repository root. Runtime databases, uploads, `.env`, private keys, archives and generated reports stay outside version control.

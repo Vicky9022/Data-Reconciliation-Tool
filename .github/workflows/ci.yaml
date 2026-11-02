@@ -9,21 +9,18 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install -r requirements.lock.txt
-      - run: python verify.py
-      - run: python benchmark.py
+      - run: python -m pip install --no-deps -e .
+      - run: python scripts/verify.py
+      - run: python benchmarks/benchmark.py --output reports/measured_results.json
       - run: docker build -t reconcile:test -t reconcile-platform:2.1 .
-      - run: python deploy/container_smoke.py --image reconcile-platform:2.1
+      - run: python scripts/checks/container_smoke.py --image reconcile-platform:2.1
       - run: docker pull caddy:2-alpine
-      - run: python deploy/tls_smoke.py
+      - run: python scripts/checks/tls_smoke.py
       - uses: actions/upload-artifact@v4
         with:
           name: measured-results
           path: |
-            measured_results.json
-            verification.json
-            test_results.txt
-            container_smoke_results.json
-            tls_smoke_results.json
+            reports/
   integration:
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -33,9 +30,10 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install -r requirements.lock.txt
+      - run: python -m pip install --no-deps -e .
       - run: docker compose -f deploy/staging.yaml up --build -d
-      - run: python deploy/wait_ready.py
-      - run: python -m unittest discover -s tests -p test_integration.py -v
+      - run: python scripts/checks/wait_ready.py
+      - run: python -m unittest discover -s tests -t . -p test_integration.py -v
         env:
           RECON_RUN_INTEGRATION: '1'
       - if: always()
@@ -50,10 +48,11 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install -r requirements.lock.txt pip-audit bandit pip-tools
+      - run: python -m pip install --no-deps -e .
       - run: pip-audit -r requirements.lock.txt
-      - run: bandit -r server.py enterprise.py distributed.py governance.py engine.py -ll
-      - run: pip-compile --generate-hashes --output-file requirements.resolved.txt requirements.txt
+      - run: bandit -r src/reconcile -ll
+      - run: mkdir -p reports && pip-compile --generate-hashes --output-file reports/requirements.resolved.txt requirements.txt
       - uses: actions/upload-artifact@v4
         with:
           name: reviewed-dependency-candidate
-          path: requirements.resolved.txt
+          path: reports/requirements.resolved.txt

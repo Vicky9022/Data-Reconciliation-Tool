@@ -7,8 +7,7 @@ import tempfile
 import secrets
 import sys
 from pathlib import Path
-sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from deploy_release import configure,portable_image_fingerprint
+from scripts.deploy import configure,portable_image_fingerprint
 
 class ReleaseConfigurationTests(unittest.TestCase):
     def test_strong_distinct_keys_and_literal_password(self):

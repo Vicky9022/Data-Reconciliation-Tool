@@ -18,7 +18,7 @@ class PostgreSQLIntegration(unittest.TestCase):
             with self.assertRaises(psycopg.errors.InsufficientPrivilege):db.execute("UPDATE source_data.customers SET balance=0 WHERE customer_id='C00001'")
 
     def test_job_lease_fencing_against_real_postgres(self):
-        from distributed import Broker
+        from reconcile.distributed import Broker
         dsn=os.environ.get('RECON_TEST_JOB_DSN','postgresql://recon_jobs:local-job-password@127.0.0.1:6543/reconcile')
         with patch.dict(os.environ,{'RECON_JOB_DATABASE_URL':dsn,'RECON_LOCAL_STAGE':'1'}):
             broker=Broker();rid='integration-'+secrets.token_hex(10)
@@ -29,8 +29,8 @@ class PostgreSQLIntegration(unittest.TestCase):
             self.assertTrue(broker.finish(rid,'first',{'verified':True}));self.assertFalse(broker.finish(rid,'first',{'late':True}))
 
     def test_live_database_ingestion_through_remote_worker(self):
-        from loadtest import request
-        from synthetic import DEFAULT_RULES
+        from benchmarks.loadtest import request
+        from reconcile.synthetic import DEFAULT_RULES
         base=os.environ.get('RECON_TEST_URL','http://127.0.0.1:8766')
         user,headers=request(base,'/api/demo-login',payload={});cookie=headers['Set-Cookie'].split(';')[0]
         created,_=request(base,'/api/runs',cookie,{'dataset':'PostgreSQL integration acceptance','connection':'customer-lab','rules':DEFAULT_RULES},user['csrf'])

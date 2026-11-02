@@ -3,7 +3,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
-from distributed import execute_claim
+from reconcile.distributed import execute_claim
 
 class FakeBroker:
     def __init__(self):self.results=[];self.valid=True

@@ -25,3 +25,12 @@ __pycache__/
 *.tar
 *.tar.gz
 *.log
+# Local build and validation output.
+reports/
+build/
+dist/
+*.egg-info/
+.coverage
+htmlcov/
+.pytest_cache/
+.ruff_cache/

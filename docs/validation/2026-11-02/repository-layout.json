@@ -1,0 +1,55 @@
+{
+  "scope": "Repository layout and package installation refactor",
+  "checked_at_utc": "2026-11-02T15:13:11.905842+00:00",
+  "local_suite": {
+    "passed": 55,
+    "live_cases_skipped_in_local_run": 3,
+    "errors": 0,
+    "failures": 0
+  },
+  "live_integration_cases_passed": 3,
+  "distinct_cases_passed": 58,
+  "packaging": {
+    "package_imported_from_wheel": true,
+    "browser_assets_in_wheel": true,
+    "cli_entry_points": true,
+    "wheel": "reconcile_platform-2.1.0-py3-none-any.whl"
+  },
+  "runtime_checks": {
+    "container_smoke_results": {
+      "image": "reconcile-platform:2.1",
+      "passed": true,
+      "checks": [
+        "Production Gunicorn process starts as non-root with a read-only root filesystem",
+        "Native login, secure cookies, mandatory MFA enrollment and recovery codes",
+        "Persisted reconciliation, exception evidence, CSV and Excel exports",
+        "Volume persistence, encrypted authenticator storage and recovery-code login survive container restart"
+      ],
+      "scope": "Disposable localhost production-image smoke test; public DNS/TLS and organization OIDC are not exercised."
+    },
+    "tls_smoke_results": {
+      "passed": true,
+      "checks": [
+        "Certificate chain and localhost identity verified with an isolated test CA",
+        "HTTPS reverse proxy reaches the production application",
+        "Production HSTS response header is present"
+      ],
+      "scope": "Local private CA; no browser warning bypass or machine trust-store modification. Public-domain ACME issuance requires the deployment domain."
+    },
+    "mail_smoke_results": {
+      "passed": true,
+      "checks": [
+        "Encrypted recovery outbox delivered to the local SMTP sink",
+        "Captured one-use link reset only the disposable member",
+        "New password authenticated successfully"
+      ],
+      "scope": "Mailpit only; no external email was sent. Test member access revoked after the check."
+    }
+  },
+  "data_directory": "Existing repository runtime/ retained; installed package never stores data in site-packages.",
+  "historical_evidence": "../2026-10-29/ retains original release evidence without rewriting its measured values.",
+  "limits": [
+    "Single coordinator and persistent local storage remain required.",
+    "No public production domain or cloud deployment is established by these local tests."
+  ]
+}

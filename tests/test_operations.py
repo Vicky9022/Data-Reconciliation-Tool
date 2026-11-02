@@ -7,9 +7,8 @@ import unittest
 import zipfile
 from pathlib import Path
 from unittest.mock import patch
-sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from server import Application,password_matches
-from manage import main
+from reconcile.server import Application,password_matches
+from reconcile.manage import main
 
 class OperationsTests(unittest.TestCase):
     def test_backup_restore_integrity_and_operator_password_reset(self):

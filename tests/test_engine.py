@@ -3,9 +3,8 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
-sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from engine import reconcile, validate_rules, compare
-from synthetic import DEFAULT_RULES,generate
+from reconcile.engine import reconcile, validate_rules, compare
+from reconcile.synthetic import DEFAULT_RULES,generate
 
 class EngineTests(unittest.TestCase):
     def compare_csv(self,source,destination,rules=None):

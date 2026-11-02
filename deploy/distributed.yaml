@@ -9,7 +9,7 @@ services:
       AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:?Set the object storage region}
   worker:
     build: .
-    command: [python, -m, distributed]
+    command: [python, -m, reconcile.distributed]
     environment:
       <<: *remote-environment
       TMPDIR: /scratch

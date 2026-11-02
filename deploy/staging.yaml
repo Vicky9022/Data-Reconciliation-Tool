@@ -36,7 +36,7 @@ services:
       disable: true
   app:
     build: ..
-    command: [python, run.py, --port, "8765", --host, "0.0.0.0", --local-stage]
+    command: [python, -m, reconcile, --port, "8765", --host, "0.0.0.0", --local-stage]
     ports:
       - 127.0.0.1:8766:8765
     environment: &stage-environment
@@ -71,7 +71,7 @@ services:
         condition: service_completed_successfully
   worker:
     build: ..
-    command: [python, -m, distributed]
+    command: [python, -m, reconcile.distributed]
     environment:
       <<: *stage-environment
       TMPDIR: /scratch
